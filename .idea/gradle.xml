@@ -9,6 +9,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/cli-download" />
+            <option value="$PROJECT_DIR$/cli-upload" />
+            <option value="$PROJECT_DIR$/dependency-resolver" />
+            <option value="$PROJECT_DIR$/repository-api" />
+            <option value="$PROJECT_DIR$/repository-google-drive" />
+            <option value="$PROJECT_DIR$/repository-local" />
+            <option value="$PROJECT_DIR$/repository-network" />
           </set>
         </option>
       </GradleProjectSettings>
