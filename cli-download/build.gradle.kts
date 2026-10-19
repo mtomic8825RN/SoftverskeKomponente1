@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":repository-api"))
+    implementation(project(":dependency-resolver"))
     testImplementation(kotlin("test"))
 }
 
