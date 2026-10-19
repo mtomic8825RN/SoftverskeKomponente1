@@ -4,7 +4,7 @@ import org.example.model.Component
 import org.example.model.RepositoryConfig
 import java.nio.file.Path
 
-interface RepositoryMenager {
+interface RepositoryManager {
     fun initialize(config: RepositoryConfig)
     fun getConfig(): RepositoryConfig
     fun updateConfig(config: RepositoryConfig)
