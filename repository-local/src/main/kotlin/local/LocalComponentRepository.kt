@@ -1,4 +1,4 @@
-package org.example.local
+package local
 
 import org.example.api.ComponentRepository
 import org.example.api.RepositoryManager
@@ -8,11 +8,9 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Properties
 
-
 class LocalComponentRepository (
     private val rootDirectory: Path
 ) : ComponentRepository, RepositoryManager {
-
 
     init{
         Files.createDirectories(rootDirectory)
@@ -22,7 +20,6 @@ class LocalComponentRepository (
     private fun getComponentDirectory(id: ComponentId): Path {
         return rootDirectory.resolve(id.organization).resolve(id.project).resolve(id.version)
     }
-
 
     private fun saveComponentInfo(component: Component) {
         val infoFile = getComponentDirectory(component.id).resolve("component.txt")
@@ -47,8 +44,6 @@ class LocalComponentRepository (
             }
         }
     }
-
-
 
     override fun findComponent(id: ComponentId): Component? {
         val directory = getComponentDirectory(id)
@@ -84,7 +79,6 @@ class LocalComponentRepository (
         return Files.exists(infoFile)
     }
 
-
     override fun findProjects(organisation: String): List<String> {
         val projects = mutableListOf<String>()
         val organizationDirectory = rootDirectory.resolve(organisation)
@@ -92,18 +86,15 @@ class LocalComponentRepository (
         if (!Files.exists(organizationDirectory)) {
             return projects
         }
-        val directories = Files.list(organizationDirectory)
-
-        for (directory in directories.toList()) {
-            if (Files.isDirectory(directory)) {
-                projects.add(directory.fileName.toString())
+        Files.list(organizationDirectory).use { directories ->
+            for (directory in directories.toList()) {
+                if (Files.isDirectory(directory)) {
+                    projects.add(directory.fileName.toString())
+                }
             }
         }
-
-        directories.close()
         return projects
     }
-
 
     override fun findVersions(organisation: String, project: String): List<String> {
         val versions = mutableListOf<String>()
@@ -112,56 +103,51 @@ class LocalComponentRepository (
         if (!Files.exists(projectDirectory)) {
             return versions
         }
-        val directories = Files.list(projectDirectory)
-
-        for (directory in directories.toList()) {
-            if (Files.isDirectory(directory)) {
-                versions.add(directory.fileName.toString())
+        Files.list(projectDirectory).use { directories ->
+            for (directory in directories.toList()) {
+                if (Files.isDirectory(directory)) {
+                    versions.add(directory.fileName.toString())
+                }
             }
         }
-
-        directories.close()
         return versions
     }
-
 
 
     override fun download(id: ComponentId, targetDirectory: Path): Path? {
         val componentDirectory = getComponentDirectory(id)
 
-        if (!componentExists(id)) {
-            return null
-        }
-        val files = Files.list(componentDirectory)
+        if (!componentExists(id)) return null
 
-        for (file in files.toList()) {
-            if (file.fileName.toString() != "component.txt") {
-                Files.createDirectories(targetDirectory)
+        Files.list(componentDirectory).use { files ->
+            for (file in files.toList()) {
+                if (file.fileName.toString() != "component.txt") {
+                    Files.createDirectories(targetDirectory)
 
-                val destination = targetDirectory.resolve(file.fileName)
-                Files.copy(file, destination)
+                    val destination = targetDirectory.resolve(file.fileName)
 
-                files.close()
-                return destination
+                    if (!Files.exists(destination)) {
+                        Files.copy(file, destination)
+                    }
+                    return destination
+                }
             }
         }
-
-        files.close()
         return null
     }
+
 
     override fun initialize(config: RepositoryConfig) {
         if (Files.exists(configFile)){
             throw IllegalStateException("Repository is already initialized")
         }
-        saveConfig(config)
+            saveConfig(config)
     }
 
     override fun getConfig(): RepositoryConfig {
         if (!Files.exists(configFile)) {
             throw IllegalStateException("Repository is not initialized")
         }
-
         val properties = Properties()
 
         Files.newInputStream(configFile).use {
@@ -178,9 +164,7 @@ class LocalComponentRepository (
 
             scopes[name] = scope
         }
-
         return RepositoryConfig(extensions.toSet(), scopes)
-
     }
 
     override fun updateConfig(config: RepositoryConfig) {
@@ -191,6 +175,9 @@ class LocalComponentRepository (
     }
 
     override fun upload(component: Component, file: Path) {
+        if (component.id.organization.isBlank() || component.id.project.isBlank() || component.id.version.isBlank()) {
+            throw IllegalArgumentException("Component identification cannot be empty")
+        }
         if(!Files.exists(file)){
             throw IllegalArgumentException("Component file does not exist")
         }
@@ -208,16 +195,24 @@ class LocalComponentRepository (
         val checkedDependencies = mutableSetOf<ComponentId>()
 
         for (dependency in component.dependencies) {
+            if (dependency.componentId.organization.isBlank() || dependency.componentId.project.isBlank() || dependency.componentId.version.isBlank()) {
+                throw IllegalArgumentException("Dependency identification cannot be empty")
+            }
             if (dependency.componentId == component.id) {
                 throw IllegalArgumentException("Component cannot depend on itself")
-            }// ne moze da komponenta zavisi od same sebe
+            }
             if (checkedDependencies.contains(dependency.componentId)) {
                 throw IllegalArgumentException("Duplicate dependency")
-            }// duplirana zavisnost
+            }
             checkedDependencies.add(dependency.componentId)
 
             if (!config.dependencyScopes.containsKey(dependency.dependencyScope.name)) {
                 throw IllegalArgumentException("Unknown dependency scope")
+            }
+            val configuredScope = config.dependencyScopes[dependency.dependencyScope.name]!!
+
+            if (configuredScope != dependency.dependencyScope) {
+                throw IllegalArgumentException("Dependency scope does not match repository configuration")
             }
             if (!componentExists(dependency.componentId)) {
                 throw IllegalArgumentException("Dependency does not exist")
@@ -225,11 +220,15 @@ class LocalComponentRepository (
         }
 
         Files.createDirectories(componentDirectory)
-        val destination = componentDirectory.resolve(file.fileName)
-        Files.copy(file,destination)
+        try {
+            val destination = componentDirectory.resolve(file.fileName)
+            Files.copy(file, destination)
 
-        saveComponentInfo(component)
-
+            saveComponentInfo(component)
+        } catch (e: Exception) {
+            componentDirectory.toFile().deleteRecursively()
+            throw e
+        }
     }
 
     private fun saveConfig(config: RepositoryConfig){

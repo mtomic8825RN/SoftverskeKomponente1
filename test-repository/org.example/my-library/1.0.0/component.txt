@@ -1,0 +1,3 @@
+org.example
+my-library
+1.0.0

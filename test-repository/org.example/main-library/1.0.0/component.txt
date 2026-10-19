@@ -1,0 +1,4 @@
+org.example
+main-library
+1.0.0
+org.example,helper-library,1.0.0,compile,false
