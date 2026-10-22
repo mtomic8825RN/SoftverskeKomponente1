@@ -1,4 +1,4 @@
-/*package local
+package local
 
 import org.example.api.ComponentRepository
 import org.example.api.ComponentRepositoryProvider
@@ -24,4 +24,4 @@ class LocalRepositoryManagerProvider : RepositoryManagerProvider {
     override val type = RepositoryType.LOCAL
     override fun create(config: RepositoryConnectionConfig): RepositoryManager =
         LocalComponentRepository(rootOf(config))
-}*/
+}

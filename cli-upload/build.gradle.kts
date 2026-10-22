@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    application
 }
 
 group = "org.example"
@@ -11,12 +12,17 @@ repositories {
 
 dependencies {
     implementation(project(":repository-api"))
+    runtimeOnly(project(":repository-local"))
     testImplementation(kotlin("test"))
+    // runtimeOnly(project(":repository-google-drive"))  // otkomentarisati kad Drive proradi
+
 }
 
-tasks.test {
-    useJUnitPlatform()
+application {
+    applicationName = "repo-upload"
+    mainClass.set("cli.upload.MainKt")
 }
+
 kotlin {
     jvmToolchain(21)
 }

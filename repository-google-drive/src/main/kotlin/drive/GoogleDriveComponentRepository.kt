@@ -1,4 +1,4 @@
-/*package drive
+package drive
 
 import org.example.api.ComponentRepository
 import org.example.api.RepositoryManager
@@ -17,8 +17,6 @@ class GoogleDriveComponentRepository(
     private val configName = "config.properties"
     private val infoName = "component.txt"
 
-    // ---------- validacija (ista kao u lokalnom) ----------
-
     private fun validatePart(value: String, what: String) {
         if (value.isBlank()) throw IllegalArgumentException("$what cannot be empty")
         if (value == "." || value == ".." || value.any { it == ',' || it == '/' || it == '\\' }) {
@@ -34,17 +32,12 @@ class GoogleDriveComponentRepository(
 
     private fun normalizeExtension(ext: String) = ext.trim().removePrefix(".").lowercase()
 
-    // ---------- navigacija kroz foldere ----------
-
-    /** ID foldera verzije, ili null ako ne postoji. */
     private fun versionFolder(id: ComponentId): String? {
         validateId(id, "Component")
         val org = storage.findFolder(rootFolderId, id.organization) ?: return null
         val project = storage.findFolder(org, id.project) ?: return null
         return storage.findFolder(project, id.version)
     }
-
-    // ---------- ComponentRepository ----------
 
     override fun componentExists(id: ComponentId): Boolean {
         val folder = versionFolder(id) ?: return false
@@ -92,8 +85,6 @@ class GoogleDriveComponentRepository(
         if (!Files.exists(destination)) storage.download(file.id, destination)
         return destination
     }
-
-    // ---------- RepositoryManager ----------
 
     override fun initialize(config: RepositoryConfig) {
         if (storage.findFile(rootFolderId, configName) != null) {
@@ -168,12 +159,10 @@ class GoogleDriveComponentRepository(
             storage.uploadFile(versionFolder, file)
             storage.writeText(versionFolder, infoName, componentInfo(component))
         } catch (e: Exception) {
-            storage.delete(versionFolder)   // ponistavanje delimicnog uploada
+            storage.delete(versionFolder)
             throw e
         }
     }
-
-    // ---------- pomocne ----------
 
     private fun componentInfo(component: Component): String = buildString {
         appendLine(component.id.organization)
@@ -208,4 +197,4 @@ class GoogleDriveComponentRepository(
         p.store(out, "Repository configuration")
         storage.writeText(rootFolderId, configName, out.toString())
     }
-}*/
+}

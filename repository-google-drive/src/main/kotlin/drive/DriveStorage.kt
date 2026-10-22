@@ -1,4 +1,4 @@
-/*package drive
+package drive
 
 import com.google.api.client.auth.oauth2.Credential
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
@@ -99,7 +99,6 @@ class DriveStorage(private val drive: Drive) {
         return out.toString(Charsets.UTF_8)
     }
 
-    /** Pravi fajl ili prepisuje postojeci. */
     fun writeText(parentId: String, name: String, text: String) {
         val content = ByteArrayContent("text/plain", text.toByteArray(Charsets.UTF_8))
         val existing = findFile(parentId, name)
@@ -118,4 +117,4 @@ class DriveStorage(private val drive: Drive) {
     fun delete(id: String) {
         drive.files().delete(id).execute()
     }
-}*/
+}

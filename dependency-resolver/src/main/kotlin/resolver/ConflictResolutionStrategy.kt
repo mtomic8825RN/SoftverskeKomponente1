@@ -1,0 +1,4 @@
+package resolver
+
+class ConflictResolutionStrategy {
+}

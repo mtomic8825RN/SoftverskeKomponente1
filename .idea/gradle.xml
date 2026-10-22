@@ -15,7 +15,6 @@
             <option value="$PROJECT_DIR$/repository-api" />
             <option value="$PROJECT_DIR$/repository-google-drive" />
             <option value="$PROJECT_DIR$/repository-local" />
-            <option value="$PROJECT_DIR$/repository-network" />
           </set>
         </option>
       </GradleProjectSettings>
