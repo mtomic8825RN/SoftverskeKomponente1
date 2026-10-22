@@ -126,4 +126,7 @@ fun main() {
     } catch (e: IllegalArgumentException) {
         println("Upload rejected: ${e.message}")
     }
+
+   /* val providers = java.util.ServiceLoader.load(org.example.api.RepositoryManagerProvider::class.java)
+    for (p in providers) println("Found provider: ${p.type}")*/
 }
