@@ -11,7 +11,6 @@ repositories {
 
 dependencies {
     implementation(project(":repository-api"))
-    implementation(project(":dependency-resolver"))   // samo zbog demo Main.kt
     testImplementation(kotlin("test"))
 }
 

@@ -1,4 +1,4 @@
-
+/*
 import local.LocalComponentRepository
 import org.example.model.Component
 import org.example.model.ComponentId
@@ -130,3 +130,4 @@ fun main() {
     val providers = java.util.ServiceLoader.load(org.example.api.RepositoryManagerProvider::class.java)
     for (p in providers) println("Found provider: ${p.type}")
 }
+*/

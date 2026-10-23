@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":repository-api"))
     implementation(project(":dependency-resolver"))
     runtimeOnly(project(":repository-local"))
-    // runtimeOnly(project(":repository-google-drive"))  // kad Drive proradi
+    runtimeOnly(project(":repository-google-drive"))
 
     testImplementation(kotlin("test"))
 }
